@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="block/case_repository/db" VERSION="2011012511"
+	COMMENT="XMLDB file for iLMS case repository"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+	<TABLES>
+		<!-- Tabellen der Fallbasis -->
+		<TABLE NAME="ilms_cases" COMMENT="iLMS case repository" NEXT="ilms_new_cases">
+			<FIELDS>
+				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="serialized_case"/>
+				<FIELD NAME="serialized_case" TYPE="text" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="used_count"/>
+				<FIELD NAME="used_count" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="serialized_case" NEXT="appliance"/>
+				<FIELD NAME="appliance" TYPE="number" LENGTH="12" DECIMALS="8" NOTNULL="true" DEFAULT="0.5" SEQUENCE="false" PREVIOUS="used_count" NEXT="appliance_user"/>
+				<FIELD NAME="appliance_user" TYPE="number" LENGTH="12" DECIMALS="8" NOTNULL="true" DEFAULT="1.0" SEQUENCE="false" PREVIOUS="appliance"/>
+			</FIELDS>
+			<KEYS>
+				<KEY NAME="primary" FIELDS="id" TYPE="primary"/>
+			</KEYS>
+		</TABLE>
+		<TABLE NAME="ilms_new_cases" COMMENT="iLMS temporary storage for new cases" PREVIOUS="ilms_cases" NEXT="ilms_states">
+			<FIELDS>
+				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="serialized_case"/>
+				<FIELD NAME="serialized_case" TYPE="text" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
+				<FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="serialized_case" NEXT="courseid"/>
+				<FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="userid" NEXT="coursemoduleid"/>
+				<FIELD NAME="coursemoduleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="timemodified"/>
+				<FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="coursemoduleid" NEXT="appliance_user" COMMENT="Optional timestamp value when this record is modified"/>
+				<FIELD NAME="appliance_user" TYPE="number" LENGTH="12" DECIMALS="8" NOTNULL="true" DEFAULT="1.0" SEQUENCE="false" PREVIOUS="timemodified"/>
+			</FIELDS>
+			<KEYS>
+				<KEY NAME="primary" FIELDS="id" TYPE="primary" NEXT="userid" />
+				<KEY NAME="userid" FIELDS="userid" TYPE="foreign" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary" NEXT="courseid"/>
+				<KEY NAME="courseid" FIELDS="courseid" TYPE="foreign" REFTABLE="course" REFFIELDS="id" PREVIOUS="userid" NEXT="coursemoduleid"/>
+				<KEY NAME="coursemoduleid" FIELDS="coursemoduleid" TYPE="foreign" REFTABLE="course_modules" REFFIELDS="id" PREVIOUS="courseid" />
+			</KEYS>
+		</TABLE>
+		<TABLE NAME="ilms_states" COMMENT="iLMS store for the current states/cases for each activity and user" PREVIOUS="ilms_new_cases" NEXT="ilms_grades">
+			<FIELDS>
+				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="coursemoduleid"/>
+				<FIELD NAME="coursemoduleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
+				<FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="coursemoduleid" NEXT="state"/>
+				<FIELD NAME="state" DEFAULT="state_not_attempted" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" PREVIOUS="userid" NEXT="timemodified"/>
+				<FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="state" COMMENT="Optional timestamp value when this record is modified"/>
+			</FIELDS>
+			<KEYS>
+				<KEY NAME="primary" FIELDS="id" TYPE="primary" NEXT="coursemoduleid" />
+				<KEY NAME="coursemoduleid" FIELDS="coursemoduleid" TYPE="foreign" REFTABLE="course_modules" REFFIELDS="id" PREVIOUS="primary" NEXT="userid"/>
+				<KEY NAME="userid" FIELDS="userid" TYPE="foreign" REFTABLE="user" REFFIELDS="id" PREVIOUS="coursemoduleid" />
+			</KEYS>
+		</TABLE>
+		<TABLE NAME="ilms_grades" COMMENT="iLMS store for all processed tracking data/grades" PREVIOUS="ilms_states" NEXT="ilms_history">
+			<FIELDS>
+				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="courseid"/>
+				<FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="caseid"/>
+				<FIELD NAME="caseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" PREVIOUS="courseid" NEXT="userid"/>
+				<FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="caseid" NEXT="lastgrade"/>
+				<FIELD NAME="lastgrade" TYPE="number" LENGTH="10" DECIMALS="5" NOTNULL="true" SEQUENCE="false" PREVIOUS="userid" NEXT="lastgrademax"/>
+				<FIELD NAME="lastgrademax" TYPE="number" LENGTH="10" DECIMALS="5" NOTNULL="true" SEQUENCE="false" PREVIOUS="lastgrade" NEXT="lastgrademin"/>
+				<FIELD NAME="lastgrademin" TYPE="number" LENGTH="10" DECIMALS="5" NOTNULL="true" SEQUENCE="false" PREVIOUS="lastgrademax" NEXT="timemodified"/>
+				<FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="lastgrademin" COMMENT="Optional timestamp value when this record is modified"/>
+			</FIELDS>
+			<KEYS>
+				<KEY NAME="primary" FIELDS="id" TYPE="primary" NEXT="courseid"/>
+				<KEY NAME="courseid" FIELDS="courseid" TYPE="foreign" REFTABLE="course_modules" REFFIELDS="id" PREVIOUS="primary" NEXT="userid"/>
+				<KEY NAME="userid" FIELDS="userid" TYPE="foreign" REFTABLE="user" REFFIELDS="id" PREVIOUS="courseid" NEXT="caseid"/>
+				<KEY NAME="caseid" FIELDS="caseid" TYPE="foreign" REFTABLE="ilms_cases" REFFIELDS="id" PREVIOUS="userid"/>
+			</KEYS>
+		</TABLE>
+		<TABLE NAME="ilms_history" PREVIOUS="ilms_grades" COMMENT="Tracking history of activities the current user has already visited (with order index)">
+			<FIELDS>
+				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="courseid"/>
+				<FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
+				<FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="coursemoduleid"/>
+				<FIELD NAME="coursemoduleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="userid" NEXT="idx"/>
+				<FIELD NAME="idx" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="coursemoduleid" NEXT="timemodified" COMMENT="Index of this element in course history list"/>
+				<FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="idx" COMMENT="Optional timestamp value when this record is modified"/>
+			</FIELDS>
+			<KEYS>
+				<KEY NAME="primary" FIELDS="id" TYPE="primary" NEXT="courseid"/>
+				<KEY NAME="courseid" FIELDS="courseid" TYPE="foreign" REFTABLE="course_modules" REFFIELDS="id" PREVIOUS="primary" NEXT="userid"/>
+				<KEY NAME="userid" FIELDS="userid" TYPE="foreign" REFTABLE="user" REFFIELDS="id" PREVIOUS="courseid" NEXT="coursemoduleid"/>
+				<KEY NAME="coursemoduleid" FIELDS="coursemoduleid" TYPE="foreign" REFTABLE="course_modules" REFFIELDS="id" PREVIOUS="userid"/>				
+			</KEYS>
+			<INDEXES>
+				<INDEX UNIQUE="false" NAME="idx" FIELDS="idx" NEXT="courseid-userid-idx"/>
+				<INDEX UNIQUE="true" NAME="courseid-userid-idx" FIELDS="courseid,userid,idx" PREVIOUS="idx"/>
+			</INDEXES>
+		</TABLE>
+	</TABLES>
+</XMLDB>
