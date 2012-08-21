@@ -203,8 +203,8 @@
         $DB->delete_records_select("ilms_grades", "timemodified < $time1year");
         $DB->delete_records_select("ilms_states", "timemodified < $time10years");
         $DB->delete_records_select("ilms_history", "timemodified < $time10years");
-        $DB->delete_records_select("ilms_learnermeta", "userid NOT IN (SELECT id FROM {user})");
-        $DB->delete_records_select("ilms_learner_knowledge", "userid NOT IN (SELECT id FROM {user})");
+        $DB->delete_records_select("block_user_preferences_learnermeta", "userid NOT IN (SELECT id FROM {user})");
+        $DB->delete_records_select("block_user_preferences_learner_knowledge", "userid NOT IN (SELECT id FROM {user})");
         $DB->delete_records_select("block_semantic_web_modmeta", "coursemoduleid NOT IN (SELECT id FROM {course_modules})");
         $DB->delete_records_select("ilms_history", "userid NOT IN (SELECT id FROM {user})");
         $DB->delete_records_select("ilms_history", "courseid NOT IN (SELECT id FROM {course})");

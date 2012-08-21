@@ -31,17 +31,17 @@ function current_case($course_ids) {
     $sql = "SELECT l2.*, d.attribute, d.type \n". 
            "FROM \n".
            "  (SELECT l.definitionid, l.subtype, SUM(l.appliance*l.value)/SUM(l.appliance) AS value  \n".
-           "   FROM {ilms_learnermeta} l   \n".
+           "   FROM {block_user_preferences_learnermeta} l   \n".
            "   WHERE userid = ? \n".
            "   GROUP BY l.subtype, l.definitionid".
            "   UNION ALL\n".
            "   SELECT d2.id as definitionid, NULL as subtype, SUM(k.appliance*k.value)/SUM(k.appliance) AS mean_value\n".
-           "   FROM {ilms_learner_knowledge} k\n".
-           "   INNER JOIN {ilms_learnermeta_definitions} d2 ON d2.attribute = 'difficulty'\n".
+           "   FROM {block_user_preferences_learner_knowledge} k\n".
+           "   INNER JOIN {block_user_preferences_learnermeta_definitions} d2 ON d2.attribute = 'difficulty'\n".
            "   WHERE userid = ? AND courseid $cids \n".
            "   GROUP BY d2.id\n".
            "  ) l2 \n".
-           "  INNER JOIN {ilms_learnermeta_definitions} d ON l2.definitionid = d.id  \n";
+           "  INNER JOIN {block_user_preferences_learnermeta_definitions} d ON l2.definitionid = d.id  \n";
     if(!$learner_meta = get_records_sql_by_field($sql, array_merge(array($USER->id, $USER->id), $params))) {
 		$learner_meta = array();
 	}
