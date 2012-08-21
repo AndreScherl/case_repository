@@ -49,7 +49,7 @@
 		if($SESSION->dasis_selectedPath == 0) {
 			$info .= "l_path:'none', ";
 		} else {
-			$info .= "l_path:'".$DB->get_field("dasis_learning_paths", "name", array("id" => $SESSION->dasis_selectedPath))."', ";
+			$info .= "l_path:'".$DB->get_field("block_semantic_web_learning_paths", "name", array("id" => $SESSION->dasis_selectedPath))."', ";
 		}
 	} else {
 		$info .= "l_path:'adaptive', ";
@@ -61,7 +61,7 @@
    	
    	
    	// Wenn die aufgerufene Aktivität nicht in der Netznavigation enthalten ist, wird keine Adaptionsfunktion aufgrufen, sondern gleich weitergeleitet
-   	if(!$DB->record_exists_select("dasis_relations", "source = ? OR target = ?", array($activity_id, $activity_id))) {
+   	if(!$DB->record_exists_select("block_semantic_web_relations", "source = ? OR target = ?", array($activity_id, $activity_id))) {
    		redirect("{$CFG->wwwroot}/mod/{$activity->name}/view.php?id=$activity_id");
    	}
     
@@ -71,9 +71,9 @@
     
     // alle Kurse, die in einem beliebigen Bundle enthalten sind werden für die Adaption berücksichtigt
  	if($SESSION->dasis_selectedBundle > 0){
- 		$sql = "SELECT DISTINCT course_id FROM {dasis_bundle_connections} WHERE bundle_id =".$SESSION->dasis_selectedBundle;
+ 		$sql = "SELECT DISTINCT course_id FROM {block_semantic_web_bundle_connections} WHERE bundle_id =".$SESSION->dasis_selectedBundle;
  	}else{
- 		$sql = "SELECT DISTINCT course_id FROM {dasis_bundle_connections}";
+ 		$sql = "SELECT DISTINCT course_id FROM {block_semantic_web_bundle_connections}";
  	}
  	$all_bundle_courses = $DB->get_records_sql($sql);
  	$bundle_courses = array();

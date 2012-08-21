@@ -205,12 +205,12 @@
         $DB->delete_records_select("ilms_history", "timemodified < $time10years");
         $DB->delete_records_select("ilms_learnermeta", "userid NOT IN (SELECT id FROM {user})");
         $DB->delete_records_select("ilms_learner_knowledge", "userid NOT IN (SELECT id FROM {user})");
-        $DB->delete_records_select("dasis_modmeta", "coursemoduleid NOT IN (SELECT id FROM {course_modules})");
+        $DB->delete_records_select("block_semantic_web_modmeta", "coursemoduleid NOT IN (SELECT id FROM {course_modules})");
         $DB->delete_records_select("ilms_history", "userid NOT IN (SELECT id FROM {user})");
         $DB->delete_records_select("ilms_history", "courseid NOT IN (SELECT id FROM {course})");
         $DB->delete_records_select("ilms_history", "coursemoduleid NOT IN (SELECT id FROM {course_modules})");
-        $DB->delete_records_select("dasis_relations", "source NOT IN (SELECT id FROM {course_modules})");
-        $DB->delete_records_select("dasis_relations", "target NOT IN (SELECT id FROM {course_modules})");
+        $DB->delete_records_select("block_semantic_web_relations", "source NOT IN (SELECT id FROM {course_modules})");
+        $DB->delete_records_select("block_semantic_web_relations", "target NOT IN (SELECT id FROM {course_modules})");
         $DB->delete_records_select("ilms_states", "userid NOT IN (SELECT id FROM {user})");
         $DB->delete_records_select("ilms_states", "coursemoduleid NOT IN (SELECT id FROM {course_modules})");
     }

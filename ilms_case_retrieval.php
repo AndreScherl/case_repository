@@ -74,7 +74,7 @@ function current_case($course_ids) {
     $activities = array();
     $language = current_language();
     $sql = "SELECT cm.id, m.id AS activitymetaid, cm.module, m.linguistic_requirement, m.logical_requirement, m.social_requirement, m.learningstyle_perception, m.learningstyle_organization, m.learningstyle_perspective, m.learningstyle_input, m.difficulty, m.learningstyle_processing, m.learning_time, s.state, cm.visible \n".
-           "FROM {dasis_modmeta} m \n".
+           "FROM {block_semantic_web_modmeta} m \n".
            "  RIGHT OUTER JOIN  {course_modules} cm ON m.coursemoduleid = cm.id \n".
            "  INNER JOIN {modules} m2 ON cm.module = m2.id \n".
            "  LEFT OUTER JOIN  {ilms_states} s ON cm.id = s.coursemoduleid AND s.userid = ? \n".
@@ -101,7 +101,7 @@ function current_case($course_ids) {
     }
     //$acts = recordset_to_array2($activities, $key_field=null);
     // Bestimme Beziehungen zu den Folgelernaktivitäten
-    if(!$relations = $DB->get_records_sql("SELECT r.id, r.target AS activityid, r.type AS semantic_type FROM {dasis_relations} r WHERE source = ?", array($current))) {
+    if(!$relations = $DB->get_records_sql("SELECT r.id, r.target AS activityid, r.type AS semantic_type FROM {block_semantic_web_relations} r WHERE source = ?", array($current))) {
     	$relations = array();
     }
     // Fall erstellen
