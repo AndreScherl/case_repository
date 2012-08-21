@@ -24,7 +24,7 @@
 				<FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="serialized_case" NEXT="courseid"/>
 				<FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="userid" NEXT="coursemoduleid"/>
 				<FIELD NAME="coursemoduleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="timemodified"/>
-				<FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="coursemoduleid" NEXT="appliance_user" COMMENT="Optional timestamp value when this record is modified"/>
+				<FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="coursemoduleid" NEXT="appliance_user" COMMENT="Optional timestamp value when this record is modified"/>
 				<FIELD NAME="appliance_user" TYPE="number" LENGTH="12" DECIMALS="8" NOTNULL="true" DEFAULT="1.0" SEQUENCE="false" PREVIOUS="timemodified"/>
 			</FIELDS>
 			<KEYS>
@@ -40,7 +40,7 @@
 				<FIELD NAME="coursemoduleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
 				<FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="coursemoduleid" NEXT="state"/>
 				<FIELD NAME="state" DEFAULT="state_not_attempted" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" PREVIOUS="userid" NEXT="timemodified"/>
-				<FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="state" COMMENT="Optional timestamp value when this record is modified"/>
+				<FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="state" COMMENT="Optional timestamp value when this record is modified"/>
 			</FIELDS>
 			<KEYS>
 				<KEY NAME="primary" FIELDS="id" TYPE="primary" NEXT="coursemoduleid" />
@@ -57,7 +57,7 @@
 				<FIELD NAME="lastgrade" TYPE="number" LENGTH="10" DECIMALS="5" NOTNULL="true" SEQUENCE="false" PREVIOUS="userid" NEXT="lastgrademax"/>
 				<FIELD NAME="lastgrademax" TYPE="number" LENGTH="10" DECIMALS="5" NOTNULL="true" SEQUENCE="false" PREVIOUS="lastgrade" NEXT="lastgrademin"/>
 				<FIELD NAME="lastgrademin" TYPE="number" LENGTH="10" DECIMALS="5" NOTNULL="true" SEQUENCE="false" PREVIOUS="lastgrademax" NEXT="timemodified"/>
-				<FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="lastgrademin" COMMENT="Optional timestamp value when this record is modified"/>
+				<FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="lastgrademin" COMMENT="Optional timestamp value when this record is modified"/>
 			</FIELDS>
 			<KEYS>
 				<KEY NAME="primary" FIELDS="id" TYPE="primary" NEXT="courseid"/>
@@ -73,7 +73,7 @@
 				<FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="coursemoduleid"/>
 				<FIELD NAME="coursemoduleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="userid" NEXT="idx"/>
 				<FIELD NAME="idx" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="coursemoduleid" NEXT="timemodified" COMMENT="Index of this element in course history list"/>
-				<FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="idx" COMMENT="Optional timestamp value when this record is modified"/>
+				<FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="idx" COMMENT="Optional timestamp value when this record is modified"/>
 			</FIELDS>
 			<KEYS>
 				<KEY NAME="primary" FIELDS="id" TYPE="primary" NEXT="courseid"/>
