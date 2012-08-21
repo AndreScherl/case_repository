@@ -42,8 +42,20 @@ function xmldb_block_case_repository_upgrade($oldversion=0) {
         $field->set_attributes(XMLDB_TYPE_NUMBER, '12, 8', null, XMLDB_NOTNULL, false, 1.0, 'appliance');
         $dbman->add_field($table, $field);
         
-        upgrade_mod_savepoint(true, 20011012500, 'block_case_repository');
+        upgrade_block_savepoint(true, 2011012500, 'case_repository');
     }
+    
+    if ($oldversion < 2012082100) {
+    	$dbman->rename_table("ilms_cases", "block_case_repository_cases", $continue=true, $feedback=true);
+    	$dbman->rename_table("ilms_grades", "block_case_repository_grades", $continue=true, $feedback=true);
+    	$dbman->rename_table("ilms_history", "block_case_repository_history", $continue=true, $feedback=true);
+    	$dbman->rename_table("ilms_new_cases", "block_case_repository_new_cases", $continue=true, $feedback=true);
+    	$dbman->rename_table("ilms_states", "block_case_repository_states", $continue=true, $feedback=true);
+    	
+    	upgrade_block_savepoint(true, 2012082100, 'semantic_web');
+    }
+    
+    return true;
 }
 
 ?>

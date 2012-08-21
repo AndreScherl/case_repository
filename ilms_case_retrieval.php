@@ -48,7 +48,7 @@ function current_case($course_ids) {
     // Lese die History der bisher besuchten Lernaktivitäten
     $sql = "SELECT h.id AS historyid , h.idx, h.timemodified, cm.id\n".
            "FROM {course_modules} cm \n".
-           "  INNER JOIN {ilms_history} h ON cm.id = h.coursemoduleid \n".
+           "  INNER JOIN {block_case_repository_history} h ON cm.id = h.coursemoduleid \n".
            "WHERE h.userid = ? AND h.courseid $cids \n";
     if(!$history = $DB->get_records_sql($sql, array_merge(array($USER->id), $params))) {
     	// Es wurde noch überhaupt keine Lernaktivität in diesem Kurs besucht
@@ -57,7 +57,7 @@ function current_case($course_ids) {
     
     // Lese die ID der aktuellen Lernaktivität (letzte in der History mit größtem Index) 
     /*
-    $sql = "SELECT MAX(idx) AS idx FROM {ilms_history} WHERE userid = $USER->id AND courseid IN $cids";
+    $sql = "SELECT MAX(idx) AS idx FROM {block_case_repository_history} WHERE userid = $USER->id AND courseid IN $cids";
     if($current = $DB->get_record_sql($sql)) {
         //$current = count($history) > 0 ? $history[$current->idx]->id : null;
         $current = count($history) > 0 ? $history[$current->idx]->id : $DB->get_field_select("course_modules", "id", "course IN $cids LIMIT 0,1"); //! Variation von Andre Scherl, damit es beim Anlegen eines Kurses keine Undefiniertheiten gibt
@@ -77,7 +77,7 @@ function current_case($course_ids) {
            "FROM {block_semantic_web_modmeta} m \n".
            "  RIGHT OUTER JOIN  {course_modules} cm ON m.coursemoduleid = cm.id \n".
            "  INNER JOIN {modules} m2 ON cm.module = m2.id \n".
-           "  LEFT OUTER JOIN  {ilms_states} s ON cm.id = s.coursemoduleid AND s.userid = ? \n".
+           "  LEFT OUTER JOIN  {block_case_repository_states} s ON cm.id = s.coursemoduleid AND s.userid = ? \n".
            "WHERE cm.course $cids AND m2.name <> 'label'"; // (GS) Bugfix iLMS-18: Labels müssen ausgefiltert werden, da sie keine Lernaktivitäten im engeren Sinn darstellen!!!
     if($activities = get_records_sql_by_field($sql, array_merge(array($USER->id), $params))) { // Dauer der isolierten Abfrage 0.5ms
         $activities_with_id_key = array();
@@ -115,7 +115,7 @@ function current_case($course_ids) {
  */
 function get_all_cases($block) {
 	global $CFG, $DB;
-    $sql = "SELECT * FROM {ilms_cases} c ORDER BY id";
+    $sql = "SELECT * FROM {block_case_repository_cases} c ORDER BY id";
     
     return $DB->get_records_sql($sql, null, $block, CASES_BLOCK_RETRIEVAL_COUNT);
 }
