@@ -87,10 +87,6 @@
      echo "  </table>\n</fieldset>\n";
      echo "<br/>\n";
      
-     echo "<fieldset>\n  <legend style=\"font-weight:bold;font-size:12pt\">".get_string('config_legend_defaults', $BLOCK_NAME)."</legend>\n";
-     echo "  <p><a href=\"{$CFG->wwwroot}/course/format/ilms/configure_metadata_presets.php\">".get_string('edit_presets', $BLOCK_NAME)."</a></p>\n";
-     echo "  <p class=\"helpdescription\"><img src=\"{$CFG->wwwroot}/pix/help.gif\" class=\"icon\" alt=\"description\" /> ".get_string("config_description_defaults", $BLOCK_NAME)."</p>\n";
-     echo "  </fieldset>\n";
      echo "<p><input type=\"submit\" value=\"".get_string('config_submit', $BLOCK_NAME)."\"/></p>\n";
      echo "</form>";
 

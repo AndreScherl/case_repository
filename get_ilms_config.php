@@ -10,7 +10,12 @@
  require_once('../../config.php');
  global $CFG;
  
- require($CFG->dataroot.'/ilms/config.php');
+ if(file_exists($CFG->dataroot.'/ilms/config.php')) {
+ 	require($CFG->dataroot.'/ilms/config.php'); // user settings in dataroot
+ } else {
+ 	require("ilms_config.php"); // default settings
+ }
+ 
  
  global $MAX_ILMS_CASE_COUNT, $REPLACE_CASE_SIMILARITY_LIMIT, $WEIGHT_FACTOR_LEARNERMETA, $WEIGHT_FACTOR_ACTIVITYMETA, $WEIGHT_FACTOR_FOLLOW_RELATIONS, $WEIGHT_FACTOR_CURRENT_ACTIVITY, $WEIGHT_FACTOR_HISTORY, $WEIGHT_FACTOR_STATES, $HALF_VALUE_TIME, $LEAK_LIMIT, $WEIGHTS_LEARNERMETA, $WEIGHTS_ACTIVITYMETA, $ENABLE_REUSE_ADJUSTMENTS, $REUSE_LEARNER_ACTIONS, $ILMS_YELLOW_MARKUP_LIMIT;
  
