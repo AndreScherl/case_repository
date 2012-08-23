@@ -57,7 +57,7 @@
 				 	      		var dasisSession = JSON.parse(o.responseText);
 				 	      		// Ziel des NEXT-Buttons auf beste nächste Lernaktivität setzen
 				 	      		if(dasisSession["path"] == "adapt") {
-				 	      			if(best_next_activity != null) {
+				 	      			if(best_next_activity.id != null) {
 				 	      				Y.one("#id_button_nextNode").set("value", M.cfg['wwwroot']+"/blocks/case_repository/start.php?id="+best_next_activity.id+"&foreward=true");
 				 	      			} else {
 				 	      				Y.one("#id_button_nextNode").set("value", "#");
@@ -1046,6 +1046,7 @@
  */
  M.block_case_repository.get_best_next_activity = function (solutions, currentcase) {
  	var best_activity = new Object();
+ 	best_activity.id = null;
  	
  	var visited_activities = this.Y.Object.values(currentcase.history);
  	visited_activities.reverse();
