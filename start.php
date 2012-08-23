@@ -76,7 +76,7 @@
  		$sql = "SELECT DISTINCT course_id FROM {block_semantic_web_bundle_connections}";
  	}
  	$all_bundle_courses = $DB->get_records_sql($sql);
- 	$bundle_courses = array();
+ 	$bundle_courses = array($COURSE->id);
  	foreach($all_bundle_courses as $bc){
  		$bundle_courses[] = $bc->course_id;
  	}
