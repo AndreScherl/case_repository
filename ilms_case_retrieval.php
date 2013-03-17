@@ -31,24 +31,24 @@ function current_case($course_ids) {
     $sql = "SELECT l2.*, d.attribute, d.type \n". 
            "FROM \n".
            "  (SELECT l.definitionid, l.subtype, SUM(l.appliance*l.value)/SUM(l.appliance) AS value  \n".
-           "   FROM {block_user_preferences_learnermeta} l   \n".
+           "   FROM {ilms_learnermeta} l   \n".
            "   WHERE userid = ? \n".
            "   GROUP BY l.subtype, l.definitionid".
            "   UNION ALL\n".
            "   SELECT d2.id as definitionid, NULL as subtype, SUM(k.appliance*k.value)/SUM(k.appliance) AS mean_value\n".
-           "   FROM {block_user_preferences_learner_knowledge} k\n".
-           "   INNER JOIN {block_user_preferences_learnermeta_definitions} d2 ON d2.attribute = 'difficulty'\n".
+           "   FROM {ilms_learner_knowledge} k\n".
+           "   INNER JOIN {ilms_learnermeta_definitions} d2 ON d2.attribute = 'difficulty'\n".
            "   WHERE userid = ? AND courseid $cids \n".
            "   GROUP BY d2.id\n".
            "  ) l2 \n".
-           "  INNER JOIN {block_user_preferences_learnermeta_definitions} d ON l2.definitionid = d.id  \n";
+           "  INNER JOIN {ilms_learnermeta_definitions} d ON l2.definitionid = d.id  \n";
     if(!$learner_meta = get_records_sql_by_field($sql, array_merge(array($USER->id, $USER->id), $params))) {
 		$learner_meta = array();
 	}
     // Lese die History der bisher besuchten Lernaktivitäten
     $sql = "SELECT h.id AS historyid , h.idx, h.timemodified, cm.id\n".
            "FROM {course_modules} cm \n".
-           "  INNER JOIN {block_case_repository_history} h ON cm.id = h.coursemoduleid \n".
+           "  INNER JOIN {ilms_history} h ON cm.id = h.coursemoduleid \n".
            "WHERE h.userid = ? AND h.courseid $cids \n";
     if(!$history = $DB->get_records_sql($sql, array_merge(array($USER->id), $params))) {
     	// Es wurde noch überhaupt keine Lernaktivität in diesem Kurs besucht
@@ -57,7 +57,7 @@ function current_case($course_ids) {
     
     // Lese die ID der aktuellen Lernaktivität (letzte in der History mit größtem Index) 
     /*
-    $sql = "SELECT MAX(idx) AS idx FROM {block_case_repository_history} WHERE userid = $USER->id AND courseid IN $cids";
+    $sql = "SELECT MAX(idx) AS idx FROM {ilms_history} WHERE userid = $USER->id AND courseid IN $cids";
     if($current = $DB->get_record_sql($sql)) {
         //$current = count($history) > 0 ? $history[$current->idx]->id : null;
         $current = count($history) > 0 ? $history[$current->idx]->id : $DB->get_field_select("course_modules", "id", "course IN $cids LIMIT 0,1"); //! Variation von Andre Scherl, damit es beim Anlegen eines Kurses keine Undefiniertheiten gibt
@@ -74,10 +74,10 @@ function current_case($course_ids) {
     $activities = array();
     $language = current_language();
     $sql = "SELECT cm.id, m.id AS activitymetaid, cm.module, m.linguistic_requirement, m.logical_requirement, m.social_requirement, m.learningstyle_perception, m.learningstyle_organization, m.learningstyle_perspective, m.learningstyle_input, m.difficulty, m.learningstyle_processing, m.learning_time, s.state, cm.visible \n".
-           "FROM {block_semantic_web_modmeta} m \n".
+           "FROM {dasis_modmeta} m \n".
            "  RIGHT OUTER JOIN  {course_modules} cm ON m.coursemoduleid = cm.id \n".
            "  INNER JOIN {modules} m2 ON cm.module = m2.id \n".
-           "  LEFT OUTER JOIN  {block_case_repository_states} s ON cm.id = s.coursemoduleid AND s.userid = ? \n".
+           "  LEFT OUTER JOIN  {ilms_states} s ON cm.id = s.coursemoduleid AND s.userid = ? \n".
            "WHERE cm.course $cids AND m2.name <> 'label'"; // (GS) Bugfix iLMS-18: Labels müssen ausgefiltert werden, da sie keine Lernaktivitäten im engeren Sinn darstellen!!!
     if($activities = get_records_sql_by_field($sql, array_merge(array($USER->id), $params))) { // Dauer der isolierten Abfrage 0.5ms
         $activities_with_id_key = array();
@@ -101,7 +101,7 @@ function current_case($course_ids) {
     }
     //$acts = recordset_to_array2($activities, $key_field=null);
     // Bestimme Beziehungen zu den Folgelernaktivitäten
-    if(!$relations = $DB->get_records_sql("SELECT r.id, r.target AS activityid, r.type AS semantic_type FROM {block_semantic_web_relations} r WHERE source = ?", array($current))) {
+    if(!$relations = $DB->get_records_sql("SELECT r.id, r.target AS activityid, r.type AS semantic_type FROM {dasis_relations} r WHERE source = ?", array($current))) {
     	$relations = array();
     }
     // Fall erstellen
@@ -115,7 +115,7 @@ function current_case($course_ids) {
  */
 function get_all_cases($block) {
 	global $CFG, $DB;
-    $sql = "SELECT * FROM {block_case_repository_cases} c ORDER BY id";
+    $sql = "SELECT * FROM {ilms_cases} c ORDER BY id";
     
     return $DB->get_records_sql($sql, null, $block, CASES_BLOCK_RETRIEVAL_COUNT);
 }

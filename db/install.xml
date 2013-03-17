@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="block/case_repository/db" VERSION="2012082100"
+<XMLDB PATH="block/case_repository/db" VERSION="2011012511"
 	COMMENT="XMLDB file for iLMS case repository"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
 	<TABLES>
 		<!-- Tabellen der Fallbasis -->
-		<TABLE NAME="block_case_repository_cases" COMMENT="iLMS case repository" NEXT="block_case_repository_new_cases">
+		<TABLE NAME="ilms_cases" COMMENT="iLMS case repository" NEXT="ilms_new_cases">
 			<FIELDS>
 				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="serialized_case"/>
 				<FIELD NAME="serialized_case" TYPE="text" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="used_count"/>
@@ -17,7 +17,7 @@
 				<KEY NAME="primary" FIELDS="id" TYPE="primary"/>
 			</KEYS>
 		</TABLE>
-		<TABLE NAME="block_case_repository_new_cases" COMMENT="iLMS temporary storage for new cases" PREVIOUS="block_case_repository_cases" NEXT="block_case_repository_states">
+		<TABLE NAME="ilms_new_cases" COMMENT="iLMS temporary storage for new cases" PREVIOUS="ilms_cases" NEXT="ilms_states">
 			<FIELDS>
 				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="serialized_case"/>
 				<FIELD NAME="serialized_case" TYPE="text" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
@@ -34,7 +34,7 @@
 				<KEY NAME="coursemoduleid" FIELDS="coursemoduleid" TYPE="foreign" REFTABLE="course_modules" REFFIELDS="id" PREVIOUS="courseid" />
 			</KEYS>
 		</TABLE>
-		<TABLE NAME="block_case_repository_states" COMMENT="iLMS store for the current states/cases for each activity and user" PREVIOUS="block_case_repository_new_cases" NEXT="block_case_repository_grades">
+		<TABLE NAME="ilms_states" COMMENT="iLMS store for the current states/cases for each activity and user" PREVIOUS="ilms_new_cases" NEXT="ilms_grades">
 			<FIELDS>
 				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="coursemoduleid"/>
 				<FIELD NAME="coursemoduleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
@@ -48,7 +48,7 @@
 				<KEY NAME="userid" FIELDS="userid" TYPE="foreign" REFTABLE="user" REFFIELDS="id" PREVIOUS="coursemoduleid" />
 			</KEYS>
 		</TABLE>
-		<TABLE NAME="block_case_repository_grades" COMMENT="iLMS store for all processed tracking data/grades" PREVIOUS="block_case_repository_states" NEXT="block_case_repository_history">
+		<TABLE NAME="ilms_grades" COMMENT="iLMS store for all processed tracking data/grades" PREVIOUS="ilms_states" NEXT="ilms_history">
 			<FIELDS>
 				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="courseid"/>
 				<FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="caseid"/>
@@ -63,10 +63,10 @@
 				<KEY NAME="primary" FIELDS="id" TYPE="primary" NEXT="courseid"/>
 				<KEY NAME="courseid" FIELDS="courseid" TYPE="foreign" REFTABLE="course_modules" REFFIELDS="id" PREVIOUS="primary" NEXT="userid"/>
 				<KEY NAME="userid" FIELDS="userid" TYPE="foreign" REFTABLE="user" REFFIELDS="id" PREVIOUS="courseid" NEXT="caseid"/>
-				<KEY NAME="caseid" FIELDS="caseid" TYPE="foreign" REFTABLE="block_case_repository_cases" REFFIELDS="id" PREVIOUS="userid"/>
+				<KEY NAME="caseid" FIELDS="caseid" TYPE="foreign" REFTABLE="ilms_cases" REFFIELDS="id" PREVIOUS="userid"/>
 			</KEYS>
 		</TABLE>
-		<TABLE NAME="block_case_repository_history" PREVIOUS="block_case_repository_grades" COMMENT="Tracking history of activities the current user has already visited (with order index)">
+		<TABLE NAME="ilms_history" PREVIOUS="ilms_grades" COMMENT="Tracking history of activities the current user has already visited (with order index)">
 			<FIELDS>
 				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="courseid"/>
 				<FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>

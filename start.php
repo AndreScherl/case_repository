@@ -86,7 +86,7 @@
     
     // Bestimme letzte Lernaktivität in der History /////////////////////
     
-    $sql = "SELECT MAX(idx) AS max FROM {block_case_repository_history} WHERE userid = {$USER->id} AND courseid = {$activity->course} ";
+    $sql = "SELECT MAX(idx) AS max FROM {ilms_history} WHERE userid = {$USER->id} AND courseid = {$activity->course} ";
     $history = $DB->get_record_sql($sql);
     if($history) {
         $history = $history->max + 1;
@@ -98,17 +98,17 @@
 		$SESSION->dasis_historyPosition = 0;
     	// Aktualisiere Status in der Datenbank //////////////////////////////
     	if(has_capability('block/case_repository:store', $context, $USER->id, false)) {
-    	    //Zeile in der block_case_repository_states Datenbank
+    	    //Zeile in der ilms_states Datenbank
     	    $stateObject->userid = $USER->id;
     	    $stateObject->coursemoduleid = $activity_id;
     	    $stateObject->timemodified = time();
-    	    if($old_state = $DB->get_record("block_case_repository_states", array("userid" => $USER->id, "coursemoduleid" => $activity_id))){
+    	    if($old_state = $DB->get_record("ilms_states", array("userid" => $USER->id, "coursemoduleid" => $activity_id))){
     	    	$stateObject->state = $old_state->state == "state_complete" ? "state_repeat" : "state_incomplete";
     	    	$stateObject->id = $old_state->id;
-    	        $DB->update_record("block_case_repository_states", $stateObject);               
+    	        $DB->update_record("ilms_states", $stateObject);               
     	    } else {
     	    	$stateObject->state = "state_incomplete";
-    	        $DB->insert_record("block_case_repository_states", $stateObject);               
+    	        $DB->insert_record("ilms_states", $stateObject);               
     	    }
     	    
     	    $newCaseObject->userid = $USER->id;
@@ -116,14 +116,14 @@
     	    $newCaseObject->courseid = $activity->course;
     	    $newCaseObject->coursemoduleid = $activity_id;
     	    $newCaseObject->timemodified = time();
-    	    $DB->insert_record("block_case_repository_new_cases", $newCaseObject); //(AS) Speichern des neuen Falls: Database error: "Data too long for column"
+    	    $DB->insert_record("ilms_new_cases", $newCaseObject); //(AS) Speichern des neuen Falls: Database error: "Data too long for column"
     	    
     	    $historyObject->userid = $USER->id;
     	    $historyObject->courseid = $activity->course;
     	    $historyObject->coursemoduleid = $activity_id;
     	    $historyObject->timemodified = time();
     	    $historyObject->idx = $history;
-    	    $DB->insert_record("block_case_repository_history", $historyObject);
+    	    $DB->insert_record("ilms_history", $historyObject);
     	}
     } else {
     	$SESSION->dasis_historyPosition++;

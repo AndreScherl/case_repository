@@ -15,7 +15,7 @@
  require_once($CFG->dirroot."/blocks/case_repository/ilms_cases.php");
  
  global $CFG, $DB;
- $sql = "SELECT * FROM {block_case_repository_cases} c ORDER BY id";   
+ $sql = "SELECT * FROM {ilms_cases} c ORDER BY id";   
  $all_cases = $DB->get_records_sql($sql);
  
  foreach($all_cases as $case){

@@ -36,7 +36,7 @@
     /**
      * Verarbeitet alle noch nicht verarbeiteten Noten und fügt die zugehörigen Fälle,
      * sondern vorhanden zur Fallbasis hinzu. Anschließend werden sie Noten markiert,
-     * (in der Tabelle block_case_repository_grades abgelegt) damit sie nicht erneut verarbeitet werden.
+     * (in der Tabelle ilms_grades abgelegt) damit sie nicht erneut verarbeitet werden.
      */
     function process_grades() {
         global $CFG, $DB;
@@ -47,7 +47,7 @@
 
         echo "  Frage Datenbank ab ...\n";
     	// Lese Fallanzahl aus
-        if(!$case_count = $DB->get_record_sql("SELECT COUNT(*) AS count FROM {block_case_repository_cases}")) {
+        if(!$case_count = $DB->get_record_sql("SELECT COUNT(*) AS count FROM {ilms_cases}")) {
             echo("  Abbruch: Kann nicht auf die Fallbasis zugreifen\n");
             return;
         }
@@ -55,12 +55,12 @@
         echo "  $case_count Fälle sind bereits in der Fallbasis vorhanden.\n";
         // Aktualisiere die bereits vorhandenen Fälle der Fallbasis
         $sql = "SELECT c.id, c.appliance, c.used_count\n ".
-               "FROM {block_case_repository_cases} c\n ";
+               "FROM {ilms_cases} c\n ";
         if($cases = get_records_sql_by_field($sql, null, "id")) {
         	foreach($cases as $case) {
         		echo "  Betrachte Fall $case->id.\n";
                 $sql = "SELECT g.id, g.userid, g.lastgrade, g.lastgrademax, g.lastgrademin, g.courseid, i.grademax, i.grademin, g2.finalgrade AS grade, g2.itemid \n ".
-                       "FROM {block_case_repository_grades} g\n ".
+                       "FROM {ilms_grades} g\n ".
                        "  INNER JOIN {grade_items} i ON g.courseid = i.courseid AND i.itemtype = 'course'\n ".
                        "  INNER JOIN {grade_grades} g2 ON g2.itemid = i.id AND g2.userid = g.userid\n ".
                        "WHERE g.caseid = ?";
@@ -72,19 +72,19 @@
                     	$grade = normalize_grades($g->grade, $g->grademin, $g->grademax);
                         echo "    Betrachte Benotung #$g->id: Bisherige Note $g->lastgrade [$g->lastgrademin,$g->lastgrademax], neue Note $g->grade [$g->grademin,$g->grademax], umgerechnet $grade.\n";
                 		$new_appliance += $grade;
-                        //execute_sql("UPDATE {block_case_repository_grades} SET lastgrademax = $g->grademax, lastgrademin = $g->grademin, lastgrade = $g->grade, timemodified = ".time()." WHERE id = $g->id", false);
+                        //execute_sql("UPDATE {ilms_grades} SET lastgrademax = $g->grademax, lastgrademin = $g->grademin, lastgrade = $g->grade, timemodified = ".time()." WHERE id = $g->id", false);
                         $gradesObject->id = $g->id;
                         $gradesObject->lastgrademax = $g->grademax;
                         $gradesObject->lastgrademin = $g->grademin;
                         $gradesObject->lastgrade = $g->grade;
                         $gradesObject->timemodified = time();
-                        $DB->update_record("block_case_repository_grades", $gradesObject);
+                        $DB->update_record("ilms_grades", $gradesObject);
                 	}
                     $new_appliance = $new_appliance / $case->used_count;
-                    //if(execute_sql("UPDATE {block_case_repository_cases} SET appliance = $new_appliance WHERE id = $case->id", false)) {
+                    //if(execute_sql("UPDATE {ilms_cases} SET appliance = $new_appliance WHERE id = $case->id", false)) {
                     $caseObject->id = $case->id;
                     $caseObject->appliance = $new_appliance;
-                    if($DB->update_record("block_case_repository_cases", $caseObject)) {
+                    if($DB->update_record("ilms_cases", $caseObject)) {
                         echo "    Aktualisierte Bewertung für diesen Fall: $new_appliance\n";
                         $transaction1->allow_commit();
                     } else {
@@ -98,10 +98,10 @@
         }
         // Füge neue Fälle hinzu
         $sql =  "SELECT c.*, i.grademax, i.grademin, g.id AS gradeid, g.finalgrade AS grade, g.itemid\n ".
-                "FROM {block_case_repository_new_cases} c \n ".
+                "FROM {ilms_new_cases} c \n ".
                 "  INNER JOIN {grade_items} i ON c.courseid = i.courseid AND i.itemtype = 'course'\n ".
                 "  INNER JOIN {grade_grades} g ON g.itemid = i.id AND c.userid = g.userid\n ".
-                "WHERE g.finalgrade IS NOT NULL"; //! (AS) finalgrade = NULL causes error when storing to block_case_repository_grades
+                "WHERE g.finalgrade IS NOT NULL"; //! (AS) finalgrade = NULL causes error when storing to ilms_grades
 
         if($cases = get_records_sql_by_field($sql)) {
         	foreach($cases as $c) {
@@ -114,14 +114,14 @@
                 $transaction2 = $DB->start_delegated_transaction();
                 // Eine neue Bewertung  
                 echo "    Setze den Status von Lernaktivität #$c->coursemoduleid auf BEENDET\n";
-                //$sql = "UPDATE {block_case_repository_states} SET state = 'state_complete', timemodified = ".time()." WHERE coursemoduleid = $c->coursemoduleid AND userid = $c->userid";
+                //$sql = "UPDATE {ilms_states} SET state = 'state_complete', timemodified = ".time()." WHERE coursemoduleid = $c->coursemoduleid AND userid = $c->userid";
                 //! ich rufe den record ab, damit ich die für das folgenden Update notwendige id bekomme
-                $stateObject = $DB->get_record("block_case_repository_states", array("coursemoduleid" => $c->coursemoduleid, "userid" => $c->userid));
+                $stateObject = $DB->get_record("ilms_states", array("coursemoduleid" => $c->coursemoduleid, "userid" => $c->userid));
                 $stateObject->coursemoduleid = $c->coursemoduleid;
                 $stateObject->userid = $c->userid;
                 $stateObject->state = 'state_complete';
                 $stateObject->timemodified = time();
-                if(!$DB->update_record("block_case_repository_states", $stateObject)) {
+                if(!$DB->update_record("ilms_states", $stateObject)) {
                     echo "    Fehler: Konnte den Status der Lernaktivität nicht auf \"abgeschlossen\" setzen\n";
                     $transaction2->rollback();
                     continue;
@@ -159,7 +159,7 @@
                     }
                     $case_count++;                         
                 }
-                //$sql = "INSERT INTO {block_case_repository_grades} (courseid, caseid, userid, lastgrade, lastgrademax, lastgrademin, timemodified) VALUES ($c->courseid, $case_id, $c->userid, $c->grade, $c->grademax, $c->grademin, ".time().")";
+                //$sql = "INSERT INTO {ilms_grades} (courseid, caseid, userid, lastgrade, lastgrademax, lastgrademin, timemodified) VALUES ($c->courseid, $case_id, $c->userid, $c->grade, $c->grademax, $c->grademin, ".time().")";
                 $gradeObject->courseid = $c->courseid;
                 $gradeObject->caseid = $case_id;
                 $gradeObject->userid = $c->userid;
@@ -167,14 +167,14 @@
                 $gradeObject->lastgrademax = $c->grademax;
                 $gradeObject->lastgrademin = $c->grademin;
                 $gradeObject->timemodified = time();
-                if(!$DB->insert_record("block_case_repository_grades", $gradeObject)) {
+                if(!$DB->insert_record("ilms_grades", $gradeObject)) {
                     echo "    Fehler: Bewertung konnte in den Tracking-Daten von iLMS nicht gesichert werden\n";
                     $transaction2->rollback();
                     continue;
                 }
                 echo "    Schließe den Fall von Lernaktivität #$c->coursemoduleid ab.\n\n";
-                //$sql = "DELETE FROM {block_case_repository_new_cases} WHERE id = $c->id";
-                if(!$DB->delete_records("block_case_repository_new_cases", array("id"=>$c->id))) {
+                //$sql = "DELETE FROM {ilms_new_cases} WHERE id = $c->id";
+                if(!$DB->delete_records("ilms_new_cases", array("id"=>$c->id))) {
                     echo "    Fehler: Konnte den den neuen Fall #$c->id nicht schließen. \n";
                     $transaction2->rollback();
                     continue;
@@ -190,7 +190,7 @@
     
     /**
      * Entfernt überflüssige oder veraltete Datensätze aus der Datenbank.
-     * Alle Datensätze, die länger als 1 Jahr in den Tabellen block_case_repository_history oder block_case_repository_grades bzw. länger als 10 Jahre in der Tabelle block_case_repository_states oder block_case_repository_history stehen werden entfernt,
+     * Alle Datensätze, die länger als 1 Jahr in den Tabellen ilms_history oder ilms_grades bzw. länger als 10 Jahre in der Tabelle ilms_states oder ilms_history stehen werden entfernt,
      * da sie aufgrund des Alters voraussichtlich nicht mehr benötigt werden (Annahme). Dadurch wird Speicherplatz freigegeben und die Verarbeitungsgeschwindigkeit des Systems beschleunigt.
      * Außerdem werden alle Datensätzen von Benutzern, Lernaktivitäten oder Kursen entfernt, die nicht mehr existieren. 
      */
@@ -199,20 +199,20 @@
         $time1year = time() - 31557600; // 1 Jahr entspricht 31 557 600 SI-Sekunden
         $time10years = time() - 315576000;
         echo "  Entferne veraltete oder überflüssige Datensätze...\n";
-    	$DB->delete_records_select("block_case_repository_new_cases", "timemodified < $time1year");
-        $DB->delete_records_select("block_case_repository_grades", "timemodified < $time1year");
-        $DB->delete_records_select("block_case_repository_states", "timemodified < $time10years");
-        $DB->delete_records_select("block_case_repository_history", "timemodified < $time10years");
-        $DB->delete_records_select("block_user_preferences_learnermeta", "userid NOT IN (SELECT id FROM {user})");
-        $DB->delete_records_select("block_user_preferences_learner_knowledge", "userid NOT IN (SELECT id FROM {user})");
-        $DB->delete_records_select("block_semantic_web_modmeta", "coursemoduleid NOT IN (SELECT id FROM {course_modules})");
-        $DB->delete_records_select("block_case_repository_history", "userid NOT IN (SELECT id FROM {user})");
-        $DB->delete_records_select("block_case_repository_history", "courseid NOT IN (SELECT id FROM {course})");
-        $DB->delete_records_select("block_case_repository_history", "coursemoduleid NOT IN (SELECT id FROM {course_modules})");
-        $DB->delete_records_select("block_semantic_web_relations", "source NOT IN (SELECT id FROM {course_modules})");
-        $DB->delete_records_select("block_semantic_web_relations", "target NOT IN (SELECT id FROM {course_modules})");
-        $DB->delete_records_select("block_case_repository_states", "userid NOT IN (SELECT id FROM {user})");
-        $DB->delete_records_select("block_case_repository_states", "coursemoduleid NOT IN (SELECT id FROM {course_modules})");
+    	$DB->delete_records_select("ilms_new_cases", "timemodified < $time1year");
+        $DB->delete_records_select("ilms_grades", "timemodified < $time1year");
+        $DB->delete_records_select("ilms_states", "timemodified < $time10years");
+        $DB->delete_records_select("ilms_history", "timemodified < $time10years");
+        $DB->delete_records_select("ilms_learnermeta", "userid NOT IN (SELECT id FROM {user})");
+        $DB->delete_records_select("ilms_learner_knowledge", "userid NOT IN (SELECT id FROM {user})");
+        $DB->delete_records_select("dasis_modmeta", "coursemoduleid NOT IN (SELECT id FROM {course_modules})");
+        $DB->delete_records_select("ilms_history", "userid NOT IN (SELECT id FROM {user})");
+        $DB->delete_records_select("ilms_history", "courseid NOT IN (SELECT id FROM {course})");
+        $DB->delete_records_select("ilms_history", "coursemoduleid NOT IN (SELECT id FROM {course_modules})");
+        $DB->delete_records_select("dasis_relations", "source NOT IN (SELECT id FROM {course_modules})");
+        $DB->delete_records_select("dasis_relations", "target NOT IN (SELECT id FROM {course_modules})");
+        $DB->delete_records_select("ilms_states", "userid NOT IN (SELECT id FROM {user})");
+        $DB->delete_records_select("ilms_states", "coursemoduleid NOT IN (SELECT id FROM {course_modules})");
     }
     
     /**
@@ -223,7 +223,7 @@
      */
     function update_case($caseid, &$g) {
     	global $CFG, $DB;
-        if(!$case = $DB->get_record("block_case_repository_cases", array("id" => $caseid))) {
+        if(!$case = $DB->get_record("ilms_cases", array("id" => $caseid))) {
             echo "    Fehler: Fall konnte für die Wiederverwendung nicht ermittelt werden\n";
             return false;
         }
@@ -238,11 +238,11 @@
             $appliance_new = (normalize_grades($g->grade, $g->grademin, $g->grademax)+$case->used_count*$case->appliance)/$used_count_new;
             echo "      Neue Repräsentativität des Falls: $appliance_new\n";
         }
-        //if(!execute_sql("UPDATE {block_case_repository_cases} SET used_count = $used_count_new, appliance = $appliance_new WHERE id = $caseid", false)) {
+        //if(!execute_sql("UPDATE {ilms_cases} SET used_count = $used_count_new, appliance = $appliance_new WHERE id = $caseid", false)) {
         $caseObject->used_count = $used_count_new;
         $caseObject->appliance = $appliance_new;
         $caseObject->id = $caseid;
-        if(!$DB->update_record("block_case_repository_cases", $caseObject)) {
+        if(!$DB->update_record("ilms_cases", $caseObject)) {
             echo "    Fehler: Fall konnte für die Wiederverwendung nicht aktualisiert werden\n";
             return false;
         }
@@ -258,20 +258,20 @@
     function remove_case($caseid) {
     	global $CFG, $DB;
         // Bestimme zu löschende Datensätze
-        if(!$case = $DB->get_record("block_case_repository_cases", array("id" => $caseid))) {
+        if(!$case = $DB->get_record("ilms_cases", array("id" => $caseid))) {
             echo "    Fehler: Kann den zu entfernenden Fall nicht bestimmen\n";
             return false;
         }
         // Entferne den Fall an sich
-        if(!$DB->delete_record("block_case_repository_cases", array("id" => $caseid))) {
+        if(!$DB->delete_record("ilms_cases", array("id" => $caseid))) {
             echo "    Fehler: Kann am schlechtesten passenden Fall nicht löschen, um Platz für den neuen Fall in der Datenbank zu schaffen\n";
             return false;
         }
         // Aktualisiere Referenz in Bewertungsdaten
-        $gradeObject = $DB->get_record("block_case_repository_grades", array("caseid" => $caseid));
+        $gradeObject = $DB->get_record("ilms_grades", array("caseid" => $caseid));
         $gradeObject->caseid = NULL;
-        //if(!execute_sql("UPDATE {block_case_repository_grades} SET caseid = NULL WHERE caseid = $caseid", false)) {
-        if(!$DB->update_record("block_case_repository_grades", $gradeObject)) {
+        //if(!execute_sql("UPDATE {ilms_grades} SET caseid = NULL WHERE caseid = $caseid", false)) {
+        if(!$DB->update_record("ilms_grades", $gradeObject)) {
             echo "    Fehler: Kann veraltete Referenz auf den Fall in den Bewertungsdaten nicht aktualisieren\n";
             return false;
         }
@@ -293,7 +293,7 @@
         $c->serialized_case = addslashes(serialize($current_case));
         $c->appliance = normalize_grades($g->grade, $g->grademin, $g->grademax);
         echo "    Normalisierte Bewertung: $c->appliance\n";
-        if(!$case_id = $DB->insert_record('block_case_repository_cases', $c)) {
+        if(!$case_id = $DB->insert_record('ilms_cases', $c)) {
             echo("    Fehler: Kann neuen Fall nicht erzeugen\n");
             return false;
         }

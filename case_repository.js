@@ -113,7 +113,7 @@
   	this.Y.io(M.cfg['wwwroot']+"/blocks/case_repository/get_all_cases.php", {
  		on: {
  			success: this.Y.bind(function(id, o) {
-            	localStorage.setItem("block_case_repository_cases", o.responseText);
+            	localStorage.setItem("ilms_cases", o.responseText);
             	localStorage.setItem("db_time", ""+(new Date().getTime()));
  			}, this)
  		} 
@@ -126,7 +126,7 @@
   * @return array of json objects
   */
   M.block_case_repository.get_all_cases = function() {
-  	var all_cases = JSON.parse(localStorage.getItem("block_case_repository_cases"));
+  	var all_cases = JSON.parse(localStorage.getItem("ilms_cases"));
   	return all_cases;	
   }
   

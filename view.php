@@ -194,7 +194,7 @@ echo "\n    <th class=\"case_repo\" colspan=\"2\"></th>";
 echo "\n    <th class=\"case_repo\">" . get_string('title_attribute', $BLOCK_USER_PREFS) . "</th>";
 echo "\n    <th class=\"case_repo\">" . get_string('title_value2', $BLOCK_USER_PREFS) . "</th>";
 echo "\n  </tr>";
-$sql = "SELECT * FROM {$CFG->prefix}block_case_repository_cases c";
+$sql = "SELECT * FROM {$CFG->prefix}ilms_cases c";
 if ($cases = $DB->get_records_sql($sql, null, $recno, CASES_BLOCK_COUNT)) {
 	foreach ($cases as $c) {
 		$case = unserialize(stripslashes($c->serialized_case));
