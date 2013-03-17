@@ -52,7 +52,17 @@ function xmldb_block_case_repository_upgrade($oldversion=0) {
     	$dbman->rename_table("ilms_new_cases", "block_case_repository_new_cases", $continue=true, $feedback=true);
     	$dbman->rename_table("ilms_states", "block_case_repository_states", $continue=true, $feedback=true);
     	
-    	upgrade_block_savepoint(true, 2012082100, 'semantic_web');
+    	upgrade_block_savepoint(true, 2012082100, 'case_repository');
+    }
+    
+    if ($oldversion < 2013031700) {
+    	$dbman->rename_table("block_case_repository_cases", "ilms_cases", $continue=true, $feedback=true);
+    	$dbman->rename_table("block_case_repository_grades", "ilms_grades", $continue=true, $feedback=true);
+    	$dbman->rename_table("block_case_repository_history", "ilms_history", $continue=true, $feedback=true);
+    	$dbman->rename_table("block_case_repository_new_cases", "ilms_new_cases", $continue=true, $feedback=true);
+    	$dbman->rename_table("block_case_repository_states", "ilms_states", $continue=true, $feedback=true);
+    	
+    	upgrade_block_savepoint(true, 2013031700, 'case_repository');
     }
     
     return true;
