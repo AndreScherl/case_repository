@@ -26,7 +26,24 @@
 
 /** Definiert die Berechtigungen für die einzelnen Menüpunkte des Blocks "Lerneradaption" und für den Zugriff auf die Fallbasis */
 $capabilities = array(
+	
+	/** Das Recht, den Block zu erstellen/hinzuzufügen
+     *  Berechtigte: Administratoren
+     */
+    'block/case_repository:addinstance' => array(
 
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'legacy' => array(
+            'guest' => CAP_PREVENT,
+            'student' => CAP_PREVENT,
+            'teacher' => CAP_PREVENT,
+            'editingteacher' => CAP_PREVENT,
+            'admin' => CAP_ALLOW
+        )
+    ),
+
+	
     /** Das Recht, die Fallbasis einsehen oder abfragen zu können
      *  Berechtigte: Administratoren
      */

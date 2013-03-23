@@ -15,9 +15,9 @@
  
  // alle Kurse, die in einem beliebigen Bundle enthalten sind werden für die Adaption berücksichtigt
  if($SESSION->dasis_selectedBundle > 0){
-     $sql = "SELECT DISTINCT course_id FROM {block_semantic_web_bundle_connections} WHERE bundle_id =".$SESSION->dasis_selectedBundle;
+     $sql = "SELECT DISTINCT course_id FROM {dasis_bundle_connections} WHERE bundle_id =".$SESSION->dasis_selectedBundle;
  }else{
-     $sql = "SELECT DISTINCT course_id FROM {block_semantic_web_bundle_connections}";
+     $sql = "SELECT DISTINCT course_id FROM {dasis_bundle_connections}";
  }
  $all_bundle_courses = $DB->get_records_sql($sql);
  global $COURSE;
