@@ -11,7 +11,7 @@
 error_reporting(E_ALL);
 
 global $CFG, $DB;
-global $USER;
+global $USER, $COURSE, $PAGE, $OUTPUT;
 
 require_once ('../../config.php');
 require_once ($CFG->libdir . '/weblib.php');
@@ -67,6 +67,11 @@ if (!$user = $DB->get_record('user', array('id' => $user_id))) {
 	error(get_string('error_invalid_user', $BLOCK_CASE_REPO));
 }
 
+$PAGE->set_context(get_context_instance(CONTEXT_SYSTEM, null));
+$PAGE->set_pagelayout("incourse");
+$PAGE->set_url("/blocks/case_repository/view.php");
+echo $OUTPUT->header();
+/*
 $navigation = array (
 	array (
 		'name' => get_string('case_repository',
@@ -81,15 +86,16 @@ print_header(get_string('case_repository', $BLOCK_CASE_REPO), get_string('case_r
 if ($switchrole == 0) {
 	role_switch($switchrole, $context);
 }
-require_login($course->id);
+require_login($COURSE->id);
 if ($switchrole > 0) {
 	role_switch($switchrole, $context);
 	require_login($course->id);
 }
 
 $context = get_context_instance(CONTEXT_SYSTEM, null);
+$PAGE->set_context($context);
 require_capability('block/case_repository:view_repository', $context, $USER->id);
-
+*/
 $user_attribs = array (
 	'spoken_language',
 	'reading',
@@ -305,5 +311,5 @@ if ($reccount >= CASES_BLOCK_COUNT) {
 	echo "<br/><cite>" . get_string('more_records', $BLOCK_CASE_REPO) . "</cite>";
 }
 echo "</p>";
-print_footer(null);
+echo $OUTPUT->footer();
 ?>
