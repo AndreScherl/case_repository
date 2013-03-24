@@ -15,7 +15,7 @@
  	//hier kommen die ganzen globalen variablen von ilms hin
  	Y: null,
  	current_case: null,
- 	ilms_globals:null
+ 	ilms_globals: null
  };
  
  M.block_case_repository.init = function(Y) {
@@ -43,7 +43,7 @@
  					var solutions = this.revise_cases(retrieved_solutions);
  					
  					// Die Lösung in PHP Session übertragen
- 					this.Y.io(M.cfg['wwwroot']+"/blocks/semantic_web/put_iLMS_solutions_to_session.php", {
+ 					this.Y.io(M.cfg["wwwroot"]+"/blocks/semantic_web/put_iLMS_solutions_to_session.php", {
  						method: "POST",
  						data: "solutions="+JSON.stringify(this.Y.Object.values(solutions))
  					});
@@ -57,7 +57,7 @@
 				 	      		var dasisSession = JSON.parse(o.responseText);
 				 	      		// Ziel des NEXT-Buttons auf beste nächste Lernaktivität setzen
 				 	      		if(dasisSession["path"] == "adapt") {
-				 	      			if(best_next_activity.id != null) {
+				 	      			if(best_next_activity.id !== null) {
 				 	      				Y.one("#id_button_nextNode").set("value", M.cfg['wwwroot']+"/blocks/case_repository/start.php?id="+best_next_activity.id+"&foreward=true");
 				 	      			} else {
 				 	      				Y.one("#id_button_nextNode").set("value", "#");
@@ -128,7 +128,7 @@
   M.block_case_repository.get_all_cases = function() {
   	var all_cases = JSON.parse(localStorage.getItem("ilms_cases"));
   	return all_cases;	
-  }
+  };
   
  /* 
   * retrieve cases
@@ -221,7 +221,7 @@
   	}, this));
   	
   	return result;
-  }
+  };
   
  /* 
   * reuse case
@@ -282,7 +282,7 @@
   		}
   	}, this));
   	return true;
-  }
+  };
   
  /* 
   * revise cases
@@ -320,7 +320,7 @@
   		solutions[max].maximum = true;
   	}
   	return solutions;
-  }
+  };
 
 
 /*! Case Compare */
@@ -375,7 +375,7 @@
   	// Gib das Ergebnis zurück
   	result.similarity = this.ilms_globals.weight_factor_learnermeta*result.similarity_learner_meta+this.ilms_globals.weight_factor_activitymeta*result.similarity_activity_meta+this.ilms_globals.weight_factor_current_activity*result.similarity_current_activity+this.ilms_globals.weight_factor_history*result.similarity_history+this.ilms_globals.weight_factor_follow_relations*result.similarity_relations+this.ilms_globals.weight_factor_states*result.similarity_states;
   	return result;
-  }
+  };
   
  /* 
   * analyze learner meta
@@ -397,7 +397,7 @@
   		}
   	});
   	return result;
-  }
+  };
   
  /* 
   * compare learner meta
@@ -412,8 +412,8 @@
   		// Für jeden Attributtyp: Mengenvergleich
   		var exists1 = t in learner_meta1;
   		var exists2 = t in learner_meta2;
-  		if(exists1 == exists2) {
-  			if(!exists1 && !exists2 || this.Y.Object.size(learner_meta1[t]) == 0 && this.Y.Object.size(learner_meta2) == 0) {
+  		if(exists1 === exists2) {
+  			if(!exists1 && !exists2 || this.Y.Object.size(learner_meta1[t]) === 0 && this.Y.Object.size(learner_meta2) === 0) {
   				// Falls in den beiden Metadaten keine Attribute für diesen Typ vorhanden sind, sind beide gleich -> HIER Gleichheit und weiter, da sonst später Division durch 0
   				result += w;
   				//continue;
@@ -440,7 +440,7 @@
   		}
   	}, this));
   	return result;
-  }
+  };
   
  /* 
   * compare activity
@@ -482,7 +482,7 @@
   		}
   	});
   	return result;
-  }
+  };
   
  /* 
   * compare best matching activities
@@ -622,7 +622,7 @@
   	});
   	
   	return result;
-  }
+  };
 
 /* 
  * get adjacence matrix
@@ -653,7 +653,7 @@
  		}
  	}
  	return result;
- }
+ };
  
 /* 
  * compare_current_activity
@@ -679,7 +679,7 @@
  	} else {
  		return 0.0;
  	}
- }
+ };
 
 /*
  * Vergleicht die Beziehungen zwischen den Folgelernaktivitäten und der jeweils aktuellen Lernaktivität im semantischen Netz.
@@ -717,7 +717,7 @@
      }, this));
      // Normalisiere die Übereinstimung in Abhängigkeit der Anzahl Lernaktivitäten im Matching
      return schnittmenge == 0 ? 0.0 : schnittmenge/(r1_count+r2_count-schnittmenge);        	
- }
+ };
 
 /*
  * Analysiert ein Array mit semantischen Beziehungen (wird intern in compare_activity_relations() benutzt).
@@ -734,7 +734,7 @@
         }
      });
      return result;
- }
+ };
 
 /*
  * Vergleicht die Zustände der aktuellen und Folge-Lernaktivitäten zwischen zwei Fällen.
@@ -761,7 +761,7 @@
         }
     });
     return activity_count == 0 ? 0.0 : result/activity_count;
- }
+ };
  
 /**
  * Vergleicht die Liste der bereits besuchten Lernaktivitäten nach dem HISTORY COMPARE-Algorithmus.
@@ -846,7 +846,7 @@
      result.mapping = solutions[max_solution_index];
      result.sum = solutions[max_solution_index].length;
      return result;
- }
+ };
 
 /*
  * Bestimmt die logarithmische Ähnlichkeit zweier numerischer Werte
@@ -858,7 +858,7 @@
  */
  M.block_case_repository.sim_logarithm = function(value1, value2, a, b) {
  	return 1.0-Math.abs(Math.log(value1)-Math.log(value2))/(Math.log(b)-Math.log(a));
- }
+ };
 
 /*
  * Bestimmt die numerische Ähnlichkeit mit unterer Grenze a.
@@ -876,7 +876,7 @@
     }else{
     	return 1.0-Math.abs(value1-value2)/(max-a);
     }
- }
+ };
 
 /*
  * Bestimmt die numerische Ähnlichkeit mit unterer Grenze a.
@@ -893,7 +893,7 @@
      }else{
      	return 1.0-Math.abs(value1-value2)/(b-min);
      }
- }
+ };
 
   
 /*! Queues */ 
@@ -954,7 +954,7 @@
  	this.elements[current] = this.elements[last];
  	this.elements.splice(last, 1);
  	return head;
- }
+ };
 /*
  * Fügt ein Element mizt der angegebenen Priorität in die Prioritätswarteschlange ein.
  *
@@ -973,7 +973,7 @@
  	}
  	// Füge das Element am freien Platz ein
  	this.elements[current] = element;
- }
+ };
  
 /*
  * Queue
@@ -987,14 +987,14 @@
  */
  Queue.prototype.delete_next = function() {
  	return this.elements.shift();
- }
+ };
 /*
  * Fügt ein Element am Ende der Warteschlange ein
  * @param mixed 	element hinzuzufügendes Element
  */
  Queue.prototype.insert = function(element) {
  	this.elements.push(element);	
- }
+ };
  
  
 /*! Semantic Web Interaction */
@@ -1022,7 +1022,7 @@
     		}
     	}
     }
- }
+ };
 
 /*
  * Aktivate/Deactivate UI Elements
@@ -1031,12 +1031,12 @@
  	if(this.Y.one("#id_bundle_selection") != null) this.Y.one("#id_bundle_selection").set("disabled", ""); 
 	if(this.Y.one("#id_path_select") != null) this.Y.one("#id_path_select").set("disabled", "");
 	if(this.Y.one("#id_button_nextNode") != null) this.Y.one("#id_button_nextNode").set("disabled", "");
- }
+ };
  M.block_case_repository.deactivate_interface_elements = function () {
  	if(this.Y.one("#id_bundle_selection") != null) this.Y.one("#id_bundle_selection").set("disabled", "disabled"); 
 	if(this.Y.one("#id_path_select") != null) this.Y.one("#id_path_select").set("disabled", "disabled");
 	if(this.Y.one("#id_button_nextNode") != null) this.Y.one("#id_button_nextNode").set("disabled", "disabled");
- }
+ };
   
 /*
  * Get best next learning activity
@@ -1053,11 +1053,11 @@
  	
  	this.Y.Object.each(solutions, function(value, key){
  		// Die beste Lernaktivität ist die mit der höchsten Appliance und keine der letzten beiden besuchten Aktivtäten
- 		if((value.appliance > best_activity.appliance || best_activity.appliance == null) && (visited_activities[0] != null && value.id != visited_activities[0].id) && (visited_activities[1] != null && value.id != visited_activities[1].id)) {
+ 		if((value.appliance > best_activity.appliance || best_activity.appliance === null) && (visited_activities[0] !== null && value.id != visited_activities[0].id) && (visited_activities[1] !== null && value.id != visited_activities[1].id)){
  			best_activity = value;
  		}
  	});
  	
  	return best_activity;
- }
+ };
   
