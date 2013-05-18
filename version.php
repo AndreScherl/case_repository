@@ -1,5 +1,5 @@
 <?php
-	$plugin->version  = 2013032300; // Plugin version
+	$plugin->version  = 2013051800; // Plugin version
 	$plugin->cron = 1; // Set min time between cron executions in seconds
 	$plugin->requires = 2010112400; // Moodle 2.0
 	$plugin->component = 'block_case_repository';

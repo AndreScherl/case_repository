@@ -56,13 +56,11 @@ function xmldb_block_case_repository_upgrade($oldversion=0) {
     }
     
     if ($oldversion < 2013031700) {
-    	$table_ilms_cases = new xmldb_table("ilms_cases");
-    	//$dbman->rename_table($table_ilms_cases, "ilms_cases", $continue=true, $feedback=true);
-    	$dbman->rename_table("ilms_cases", "ilms_cases", $continue=true, $feedback=true);
-    	$dbman->rename_table("ilms_grades", "ilms_grades", $continue=true, $feedback=true);
-    	$dbman->rename_table("ilms_history", "ilms_history", $continue=true, $feedback=true);
-    	$dbman->rename_table("ilms_new_cases", "ilms_new_cases", $continue=true, $feedback=true);
-    	$dbman->rename_table("ilms_states", "ilms_states", $continue=true, $feedback=true);
+    	$dbman->rename_table("block_case_repository_cases", "ilms_cases", $continue=true, $feedback=true);
+    	$dbman->rename_table("block_case_repository_grades", "ilms_grades", $continue=true, $feedback=true);
+    	$dbman->rename_table("block_case_repository_history", "ilms_history", $continue=true, $feedback=true);
+    	$dbman->rename_table("block_case_repository_new_cases", "ilms_new_cases", $continue=true, $feedback=true);
+    	$dbman->rename_table("block_case_repository_states", "ilms_states", $continue=true, $feedback=true);
     	
     	upgrade_block_savepoint(true, 2013031700, 'case_repository');
     }
